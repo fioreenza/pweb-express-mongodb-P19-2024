@@ -1,35 +1,46 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// Middleware untuk mengautentikasi pengguna
-export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers['authorization']?.split(' ')[1]; // Mengambil token dari header Authorization
-
-  // Jika token tidak ada, respons dengan error
-  if (!token) {
-    return res.status(401).json({
-      status: "error",
-      message: "No token provided",
-      data: {},
-    });
+// Extend Express Request type untuk menambah user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any; // Bisa diganti dengan interface User yang lebih spesifik
+    }
   }
+}
 
-  // Verifikasi token
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({
-        status: "error",
-        message: "Failed to authenticate token",
-        data: {},
+export const authenticate = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  try {
+    // Ambil token dari header
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader?.startsWith('Bearer ')) {
+      res.status(401).json({ 
+        status: 'error',
+        message: 'No token provided' 
       });
+      return;
     }
 
-    // Jika token valid, simpan informasi pengguna ke dalam request untuk digunakan di route selanjutnya
-    req.body.userId = (decoded as any).userId; // Menyimpan userId dari token ke dalam request
-    next(); // Lanjut ke middleware berikutnya
-  });
+    const token = authHeader.split(' ')[1];
+    
+    // Verifikasi token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    
+    // Tambahkan user ke request object
+    req.user = decoded;
+    
+    // Lanjut ke handler berikutnya
+    next();
+  } catch (error) {
+    res.status(401).json({ 
+      status: 'error',
+      message: 'Invalid token'
+    });
+  }
 };
