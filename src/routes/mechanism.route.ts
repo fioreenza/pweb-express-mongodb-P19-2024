@@ -4,7 +4,6 @@ import { returnBook } from '../controllers/mechanism.controller';
 
 const router = Router();
 
-// POST route to borrow a book
 router.post('/borrow/:id', (req, res, next) => {
     borrowBook(req, res, next);
 });
