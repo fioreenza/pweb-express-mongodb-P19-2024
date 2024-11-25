@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import connectDB from './db-connection';
 import authRoutes from './routes/auth.route';
 import authenticate from './middleware/auth';
@@ -10,6 +11,15 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
+
+// Konfigurasi CORS
+app.use(
+  cors({
+    origin: 'http://localhost:5173', // Ganti dengan domain frontend kamu
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Metode HTTP yang diizinkan
+    allowedHeaders: ['Content-Type', 'Authorization'], // Header yang diizinkan
+  })
+);
 
 // Koneksi ke Database
 connectDB();
@@ -32,12 +42,4 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
-
-//izinkan CORS localhost:3000
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://localhost:5173');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
 });
