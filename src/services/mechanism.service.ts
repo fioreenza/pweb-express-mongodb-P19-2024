@@ -13,8 +13,6 @@ export const borrowBookService = async (bookId: string) => {
       throw new Error('Book is not available');
     }
 
-    // Decrease the quantity by 1
-    book.qty -= 1;
     await book.save();
 
     return book.qty;
@@ -31,8 +29,6 @@ export const returnBookService = async (bookId: string) => {
       throw new Error('Book not found');
     }
 
-    // Increase the quantity by 1 when the book is returned
-    book.qty += 1;
     await book.save();
 
     return book.qty;

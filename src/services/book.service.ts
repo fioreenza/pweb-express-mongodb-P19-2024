@@ -11,6 +11,16 @@ export class BookService {
   }
 
   async addNewBook(bookData: Partial<BookInterface>) {
+    if (bookData.qty <= 0) {
+      throw new Error('Quantity must be greater than 0');
+    }
+    if (bookData.initialQty <= 0) {
+      throw new Error('Initial quantity must be greater than 0');
+    }
+    if (bookData.qty > (bookData.initialQty || 0)) {
+      throw new Error('Quantity cannot be greater than initial quantity');
+    }
+
     const newBook = new Book(bookData);
     return await newBook.save();
   }

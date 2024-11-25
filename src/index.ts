@@ -17,7 +17,7 @@ connectDB();
 // Route ke API Auth
 app.use('/auth', authRoutes);
 
-app.use('/book', authenticate, bookRoutes);
+app.use('/book', bookRoutes);
 
 app.use('/mechanism', authenticate, mechanismRoutes);
 
